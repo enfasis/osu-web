@@ -87,7 +87,7 @@ window.addEventListener("keydown", function (e) {
         var futuremost = 0;
         var current = game.lastHit;
         var songTime = game.timestamp - game.songStartTime;  
-        while(current < objects.length && futuremost < songTime-OFFSET-FADE-APPEAR){
+        while(current < objects.length && futuremost < songTime-OFFSET-2*FADE-2*APPEAR){
             futuremost = objects[current].time;
             current++;
         }
@@ -95,12 +95,20 @@ window.addEventListener("keydown", function (e) {
         var time =  songTime - game.difficulties[game.level].hitObjects[game.lastHit].time;
         var isInX = Math.abs(game.mouseX - game.scenes["start"].getChildAt(game.lastHit).x)<=CIRCLESIZE*128?true:false;
         var isInY = Math.abs(game.mouseY - game.scenes["start"].getChildAt(game.lastHit).y)<=CIRCLESIZE*128?true:false;
-        console.log(time + " " + game.hit + " " + game.lastHit +" " +isInX +" "+ isInY);
-        if(isInX && isInY) game.score["goodClicks"]++;
+        console.log(time + " " + game.hit + " " + game.lastHit +" " +isInX +" "+ isInY);        
+        if(time > (FADE+APPEAR) &&isInX && isInY) game.score["goodClicks"]++;
         game.click = true;
     }
 });
-
+window.addEventListener("keyup", function (e) {
+    if (e.keyCode === 27 && game.isready) { // escape        
+        game.isready = false;        
+        game.state = menu;
+        game.startScene("menu");  
+        game.scenes["select"].visible = true;
+        document.getElementById("drop_zone").style.display = "block";   
+    }
+});
 window.addEventListener("keyup", function (e) {
     if (e.keyCode === 70 || e.keyCode === 68 // fd
         || e.keyCode === 90 || e.keyCode === 88 // zx
@@ -145,6 +153,7 @@ function playback(){
         game.startScene("menu");        
         game.scenes["start"].removeChildren;
         game.scenes["select"].visible = true;
+        document.getElementById("drop_zone").style.display = "block";
     };
     game.scenes["stats"].getChildAt(0).text = game.score["goodClicks"];
  }

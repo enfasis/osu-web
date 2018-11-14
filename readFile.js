@@ -135,7 +135,12 @@ function decode(file) {
     game.difficulties.push(difficulty);    
 }
 
-function selectLevel(level) {
+function selectLevel(level) {           
+    game.hit= 0;        
+    game.lastHit= 0;
+    game.score["goodClicks"] = 0;      
+    game.scenes["start"].removeChildren();        
+    game.scenes["stats"].removeChildren();
     var hitObjects = game.difficulties[level].hitObjects;
     var sY = window.innerHeight*0.9;
     var ssY = window.innerHeight*0.05;
@@ -172,7 +177,7 @@ function selectLevel(level) {
     window.gameSound.pause();
     window.gameSound.seek(0);
     window.gameSound.play();
-    document.getElementById("select").style.display = "none";
+    document.getElementById("drop_zone").style.display = "none";
     game.isready = true;
 }
 
@@ -190,7 +195,6 @@ var check = function() {
         for(var i = 0 ; i<levels; i++){                       
             document.getElementById("list").innerHTML += '<p onclick="selectLevel('+i+')">'+game.difficulties[i].metadata["Version"]+'</p>';
         }
-        document.getElementById("select").style.display = "inline-block";
         game.scenes["select"].visible = true;
         return;
     }
@@ -200,6 +204,10 @@ check();
 
 function handleDragDrop(e) {
     dragNOP(e);
+        if(game.difficulties.length>0){
+            game.difficulties = [];
+        }
+    console.log("cargando");
     var files = e.dataTransfer.files;    
     for (var i = 0; i < files.length; i++) {
         if (files[i].name.indexOf(".mp3") !== -1) {
@@ -215,7 +223,6 @@ function handleDragDrop(e) {
             });
             window.gameSound.once('load', function () {
                 window.gameSound.play();
-                drop_zone.style.display = "none";
                 window.menuSound.pause();
             });
         } else if (files[i].name.indexOf(".osu") !== -1) {
