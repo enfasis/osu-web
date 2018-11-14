@@ -19,8 +19,10 @@ window.analyser.fftSize = 256;
 window.bufferLength = window.analyser.frequencyBinCount;
 window.dataArray = new Uint8Array(window.bufferLength);
 var TIMECONSTANT = 1000;
-var APPEAR = TIMECONSTANT/8;
-var FADE = TIMECONSTANT/10;
+var APPEAR = TIMECONSTANT;
+var FADE = TIMECONSTANT;
+var OFFSET = -0.1*TIMECONSTANT;
+var CIRCLESIZE = 0;
 var game = {
     canvas: null,
     cursor: null,
@@ -35,6 +37,7 @@ var game = {
     mouseX: 0,
     mouseY: 0,
     click: false,
+    lastHit: 0,
     hit: 0,
     timestamp: 0,
     songStartTime: 0,
@@ -80,6 +83,20 @@ window.addEventListener("keydown", function (e) {
         || e.keyCode === 90 || e.keyCode === 88 // zx
         ) {
         hitSound.play();
+        var objects = game.difficulties[game.level].hitObjects;        
+        var futuremost = 0;
+        var current = game.lastHit;
+        var songTime = game.timestamp - game.songStartTime;  
+        while(current < objects.length && futuremost < songTime-OFFSET-FADE-APPEAR){
+            futuremost = objects[current].time;
+            current++;
+        }
+        game.lastHit = current-1;
+        var time =  songTime - game.difficulties[game.level].hitObjects[game.lastHit].time;
+        var isInX = Math.abs(game.mouseX - game.scenes["start"].getChildAt(game.lastHit).x)<=CIRCLESIZE*128?true:false;
+        var isInY = Math.abs(game.mouseY - game.scenes["start"].getChildAt(game.lastHit).y)<=CIRCLESIZE*128?true:false;
+        console.log(time + " " + game.hit + " " + game.lastHit +" " +isInX +" "+ isInY);
+        if(isInX && isInY) game.score["goodClicks"]++;
         game.click = true;
     }
 });
@@ -111,23 +128,25 @@ function updateHitObjects(songTime) {
         current++;
     }
     for(var i = game.hit; i<current; i++){        
-        game.scenes["start"].getChildAt(i).alpha = updateHit(songTime-objects[i].time-100);         
+        game.scenes["start"].getChildAt(i).alpha = updateHit(songTime-objects[i].time-OFFSET);         
     }    
 }
+
 
 function playback(){    
     var songTime = game.timestamp - game.songStartTime;
     var current = game.difficulties[game.level].hitObjects[game.hit].time;
     updateHitObjects(songTime);
-    if (current+TIMECONSTANT <= songTime) game.hit++;
+    if (current <= songTime - 5*TIMECONSTANT) game.hit++;
     if(game.hit == game.difficulties[game.level].hitObjects.length) {
         game.isready = false;        
         game.hit= 0;        
-        game.state = load;
+        game.state = menu;
         game.startScene("menu");        
         game.scenes["start"].removeChildren;
         game.scenes["select"].visible = true;
     };
+    game.scenes["stats"].getChildAt(0).text = game.score["goodClicks"];
  }
 
 function loadMenu(){    
@@ -161,8 +180,10 @@ function menu() {
     for (var i = 1; i < 0.25*window.bufferLength; i++){
         game.scenes["menu"].getChildAt(i).height = (7*(window.dataArray[i]/256))**3;
     }  
+    game.scenes["menu"].getChildAt(0).scale.set(1.7+(dataArray[0]+dataArray[1]+dataArray[2])/(6*256));
     if (game.isready) {        
         game.startScene("start");
+        game.scenes["stats"].visible = true;
         game.state = playback;
     }
 }

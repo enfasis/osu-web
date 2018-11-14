@@ -137,19 +137,36 @@ function decode(file) {
 
 function selectLevel(level) {
     var hitObjects = game.difficulties[level].hitObjects;
-    var sY = window.innerHeight-60;
+    var sY = window.innerHeight*0.9;
+    var ssY = window.innerHeight*0.05;
     var sX = sY * 4 / 3;
-    var ssX = window.innerWidth * 1 / 8;
+    var ssX = (window.innerWidth - sX)/2;
+    CIRCLESIZE = 0.9+1/game.difficulties[level].difficulty["CircleSize"];
+    APPEAR =1*TIMECONSTANT/game.difficulties[level].difficulty["ApproachRate"];
+    FADE =0.8*TIMECONSTANT/game.difficulties[level].difficulty["ApproachRate"];
     for (var i = 0; i < hitObjects.length; i++) {
         var hit = new PIXI.Sprite(window.osuTexture["score"]);
         hit.anchor.set(0.5);
-        hit.scale.set(1);
-        hit.y = hitObjects[i].y * sY+30;
+        hit.scale.set(CIRCLESIZE);
+        hit.y = hitObjects[i].y * sY + ssY;
         hit.x = hitObjects[i].x * sX + ssX;     
         hit.alpha = 0;
         hit.visible = true;
         game.scenes["start"].addChild(hit);
     }
+    var countingText = new PIXI.Text('0', {
+        fontWeight: 'bold',
+        fontStyle: 'italic',
+        fontSize: 60,
+        fontFamily: 'Arial',
+        fill: '#ffffff',
+        align: 'left',
+    });
+    countingText.anchor.set(0);
+    countingText.x=0;
+    countingText.y=0;    
+    game.scenes["stats"].addChild(countingText);
+    game.scenes["stats"].getChildAt(0).text = game.score["goodClicks"];
     game.level = level;
     game.songStartTime = game.timestamp;
     window.gameSound.pause();
