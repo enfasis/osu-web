@@ -1,0 +1,72 @@
+﻿<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Osu! Trainer</title>
+    <style>
+        html, body, #drop_zone,#select {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+        canvas {
+            cursor: none !important;
+        }
+        #drop_zone, #select{
+            cursor: none;
+            background: none;
+            color: white;
+            position: absolute;
+            z-index: 1;
+        }
+        p{  
+            font-family: 'Segoe UI';
+            font-size: 2em;
+            text-shadow: 0px 0px 10px #000000;
+            text-align: center;          
+        }
+        .title {
+            position: absolute;
+            left: 50%;
+            top: 10%;
+            transform: translate(-50%, -50%);
+        }
+        #list{
+            position: absolute;
+            height: 70%;
+            width: 30%;
+            left: 50%;
+            top: 70%;
+            transform: translate(-50%, -50%);
+        }
+        #list p{
+            display: inline-block;
+            font-family: 'Segoe UI';
+            font-size: 1.5em;            
+            background-color: rgba(0,0,0,0.5);
+            border: 2px solid rgba(250,250,250,0.9);
+            padding: 10px 20px;
+            margin:10px 5px;
+        }
+        #list p:hover{
+            font-size: 1.6em;
+        }
+    </style>
+</head>
+<body>
+    <div id="drop_zone">
+            <p class="title">Arrastra los archivos para empezar</p>
+    </div>
+    <div id="select" style="display:none">
+        <p id="name" class="title"></p>
+        <div id="list">
+        </div>
+    </div>
+    <script src="lib/pixi.min.js"></script>
+    <script src="lib/howler.js"></script>
+    <script src="readFile.js"></script>
+    <script src="osu.js"></script>
+</body>
+</html>
